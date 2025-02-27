@@ -1,0 +1,6 @@
+ML/data/processed/BTCUSDT_15m_processed.csv
+
+.codegpt
+backtest_results_improved/backtest_improved.csv
+.env
+api-c-binance.py
