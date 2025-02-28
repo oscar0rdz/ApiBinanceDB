@@ -1,3 +1,4 @@
+
 Binance-Postgres Service
 Este proyecto personal fue desarrollado para demostrar mis habilidades en el desarrollo backend y manejo de bases de datos.
 Se conecta a la API de Binance, descarga datos OHLCV (candlestick) de criptomonedas y los almacena en una base de datos PostgreSQL utilizando FastAPI y Tortoise ORM.
@@ -106,6 +107,16 @@ Copiar
 │   ├── main.py              # Archivo principal de la aplicación (FastAPI)
 │   └── ...
 │
+├── ML
+│   ├── model_training.py    # Script de entrenamiento/ejemplo para futuros desarrollos
+│   ├── data
+│   │   ├── raw              # Datos en bruto
+│   │   └── processed        # Datos procesados
+│   └── ...
+│
+├── tests                    # (Directorio preparado para pruebas, aunque en este portafolio se incluirán fotos y evidencias visuales)
+│   └── ...                  
+│
 ├── .env                     # Variables de entorno (no incluir en repositorios públicos)
 ├── requirements.txt         # Dependencias del proyecto
 ├── README.md                # Documentación principal
@@ -164,13 +175,10 @@ El código se comparte para fines de demostración y aprendizaje.
 Puedes usarlo y modificarlo para inspirarte en tus propios proyectos, siempre dando el crédito correspondiente cuando sea necesario.
 
 Próximos Pasos
-Este proyecto sirvió como base para futuros desarrollos,  pero para evitar sobre cargar  todo en un solo sitio los dividi pero tales como:
+Este proyecto sirvió como base para futuros desarrollos, tales como:
 
 Un modelo de aprendizaje automático (machine learning):
 Utilizando los datos descargados para entrenar modelos predictivos en el ámbito de las criptomonedas.
 
 Un Bot Market Maker:
 Aprovechando la estructura y la ingesta de datos para desarrollar un bot que pueda realizar operaciones automatizadas en el mercado.
-
-Nota: Próximamente se agregarán fotos y evidencias visuales que demuestren el funcionamiento del sistema, así como ejemplos de resultados en la documentación del portafolio.
-
