@@ -1,9 +1,3 @@
-Listo, Mtro. Yarek. Aquí tienes el archivo en Markdown para descargar y también el contenido completo para **copiar y pegar**.
-
-**[Descargar README_Binance_Postgres_Service.md](sandbox:/mnt/data/README_Binance_Postgres_Service_v2.md)**
-
----
-
 
 
 <h1 align="center">Binance-Postgres Service</h1>
