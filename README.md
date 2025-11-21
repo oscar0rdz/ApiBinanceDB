@@ -6,8 +6,7 @@
 
 <p align="center">
   Servicio backend que <b>descarga velas OHLCV desde la API de Binance</b> y las <b>almacena en PostgreSQL</b> mediante una <b>API REST</b> asincrónica con FastAPI.
-  <br/>Proyecto de portafolio orientado a backend: reproducible, explicable y fácil de extender.
-</p>
+
 
 ---
 
