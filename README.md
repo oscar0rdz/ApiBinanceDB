@@ -1,3 +1,10 @@
+Listo, Mtro. Yarek. Aquí tienes el archivo en Markdown para descargar y también el contenido completo para **copiar y pegar**.
+
+**[Descargar README_Binance_Postgres_Service.md](sandbox:/mnt/data/README_Binance_Postgres_Service_v2.md)**
+
+---
+
+```markdown
 <!-- Encabezado centrado con badges -->
 <h1 align="center">Binance-Postgres Service</h1>
 <p align="center"><b>FastAPI + Tortoise ORM + PostgreSQL (async)</b></p>
@@ -12,13 +19,13 @@
 
 <p align="center">
   Servicio backend que <b>descarga velas OHLCV desde la API de Binance</b> y las <b>almacena en PostgreSQL</b> mediante una <b>API REST</b> asincrónica con FastAPI.
-  <br>Proyecto de portafolio orientado a backend: reproducible, explicable y fácil de extender.
+  <br/>Proyecto de portafolio orientado a backend: reproducible, explicable y fácil de extender.
 </p>
 
-<hr/>
+---
 
 ## Tabla de contenidos
-- [TL;DR](#tldr)
+- [Narrativa: ¿Qué hace y cómo lo hace?](#narrativa-qué-hace-y-cómo-lo-hace)
 - [Arquitectura](#arquitectura)
 - [Stack (y por qué)](#stack-y-por-qué)
 - [Características](#características)
@@ -27,8 +34,8 @@
 - [Configuración](#configuración)
 - [Ejecución](#ejecución)
 - [Endpoints](#endpoints)
+- [Buenas prácticas y decisiones](#buenas-prácticas-y-decisiones)
 - [Pruebas (sugerido)](#pruebas-sugerido)
-- [Seguridad y configuración](#seguridad-y-configuración)
 - [Roadmap](#roadmap)
 - [Docker Compose (opcional)](#docker-compose-opcional)
 - [Licencia](#licencia)
@@ -36,70 +43,67 @@
 
 ---
 
-## TL;DR
-- **Ingesta confiable** de OHLCV desde Binance.
-- **Persistencia idempotente** en PostgreSQL (sin duplicados) con `UNIQUE(symbol, interval, open_time)`.
-- **API REST** lista para integrar: inserta, lista y también **dispara capturas** desde la propia API.
-- **Async end-to-end** (FastAPI + aiohttp + Tortoise) → buen throughput sin bloquear.
-- Base sólida para **ETL, ML** o un **bot market maker** posterior.
+## Narrativa: ¿Qué hace y cómo lo hace?
+
+**Historia corta:** quieres un **histórico confiable de velas (OHLCV)** de Binance en **tu propia base de datos** para análisis, ETL o ML. Este servicio lo resuelve así:
+
+1) **Recibes una petición** a la API (`/fetch_and_store_data/{symbol}`) con parámetros como `interval`, `start_date`, `end_date`, `max_candles`.  
+2) **Consultamos Binance** de forma asincrónica con `aiohttp`, respetando timeouts y reintentos.  
+3) **Normalizamos la respuesta** a un esquema claro de velas: `open_time, open, high, low, close, volume, close_time, trades`, etc.  
+4) **Insertamos en PostgreSQL** con `Tortoise ORM` y una **constraint única** `UNIQUE(symbol, interval, open_time)` para evitar duplicados (idempotencia).  
+5) **Respondemos un resumen**: cuántas velas se insertaron, cuántas se omitieron por duplicado, rango temporal cubierto y el estado de la operación.
+
+Resultado: un backend que **descarga, valida y guarda** datos de mercado listos para **ciencia de datos, dashboards, pipelines de ML o un bot** posterior.
 
 ---
 
 ## Arquitectura
 
-          ┌─────────────┐        HTTP (async)        ┌───────────────┐
+```
+
+```
+      ┌─────────────┐        HTTP (async)        ┌───────────────┐
+```
+
 Request → │   FastAPI   │  ───────────────────────→  │  Binance API  │
-          └─────┬───────┘                            └───────────────┘
-                │
-                │  Models / Repos (Tortoise ORM async)
-                ▼
-          ┌─────────────┐     SQL (async)     ┌────────────────────┐
-          │  Services   │  ─────────────────→ │   PostgreSQL 12+   │
-          │  Layer      │  ←─────────────────  │ (índices únicos)   │
-          └─────────────┘                      └────────────────────┘
-Decisiones clave
+└─────┬───────┘                            └───────────────┘
+│
+│  Models / Repos (Tortoise ORM async)
+▼
+┌─────────────┐     SQL (async)     ┌────────────────────┐
+│  Services   │  ─────────────────→ │   PostgreSQL 12+   │
+│  Layer      │  ←─────────────────  │ (índices únicos)   │
+└─────────────┘                      └────────────────────┘
 
-FastAPI: OpenAPI automático, validación y rendimiento.
+````
 
-Tortoise ORM (async): consultas no bloqueantes; unique_together para idempotencia.
+---
 
-aiohttp: cliente HTTP asincrónico (timeouts, backoff, manejo de 429/5xx).
+## Stack (y por qué)
 
-PostgreSQL: tipos NUMERIC para valores financieros y constraints robustos.
+- **FastAPI + Uvicorn** → rendimiento, tipado, OpenAPI, auto-docs.  
+- **Tortoise ORM (async)** → modelos Python→SQL con consultas no bloqueantes; `unique_together` para idempotencia.  
+- **PostgreSQL** → precisión numérica (`NUMERIC`) e integridad (índices, constraints).  
+- **aiohttp** → cliente HTTP asincrónico con timeouts/backoff para Binance.  
+- **pandas** → ayudante para normalización/validación cuando aplica.  
+- **python-dotenv** → configuración segura y portable via `.env`.
 
-Stack (y por qué)
-FastAPI + Uvicorn → rendimiento, tipado y OpenAPI → integraciones rápidas.
+---
 
-Tortoise ORM (async) → modelos Python → SQL; unique_together para deduplicar.
+## Características
 
-PostgreSQL → robusto en producción (índices, constraints, precisión numérica).
+- **Descarga** velas OHLCV por `symbol` y `interval` (1m, 15m, 1h, 1d…).  
+- **Inserción segura** en PostgreSQL con `UNIQUE(symbol, interval, open_time)`.  
+- **API REST** para insertar y listar **trades** y **historical prices**, y una ruta de **captura** hacia Binance.  
+- **Async/await** end-to-end → menor latencia, mejor throughput.  
+- **Documentación interactiva**: `/docs` (Swagger) y `/redoc`.
 
-aiohttp → HTTP no bloqueante para ráfagas controladas a Binance.
+---
 
-pandas → reshape/validación cuando aplica.
+## Esquema de Datos (SQL & ORM)
 
-python-dotenv → configuración segura y portable.
-
-Características
-Descarga desde Binance: velas OHLCV por symbol/interval (1m, 15m, 1h, 1d…).
-
-Inserción segura: evita duplicados por UNIQUE(symbol, interval, open_time).
-
-API REST:
-
-POST /trades · GET /trades
-
-POST /historical_prices · GET /historical_prices
-
-GET /fetch_and_store_data/{symbol} → descarga y guarda en DB
-
-Async/await e2e · .env para secretos · /docs y /redoc para documentación interactiva.
-
-Esquema de Datos (SQL & ORM)
-SQL (candle)
-
-sql
-Copiar código
+**SQL (tabla `candle`)**
+```sql
 CREATE TABLE IF NOT EXISTS candle (
     id BIGSERIAL PRIMARY KEY,
     symbol        VARCHAR(15)   NOT NULL,
@@ -118,10 +122,11 @@ CREATE TABLE IF NOT EXISTS candle (
     created_at    TIMESTAMPTZ   DEFAULT NOW(),
     UNIQUE(symbol, interval, open_time)
 );
-Tortoise ORM (equivalente)
+````
 
-python
-Copiar código
+**Tortoise ORM (equivalente)**
+
+```python
 from tortoise import fields, models
 
 class Candle(models.Model):
@@ -143,9 +148,13 @@ class Candle(models.Model):
 
     class Meta:
         unique_together = ("symbol", "interval", "open_time")
-Instalación
-bash
-Copiar código
+```
+
+---
+
+## Instalación
+
+```bash
 # 1) Clonar
 git clone https://github.com/oscar0rdz/ApiBinanceDB.git
 cd ApiBinanceDB
@@ -158,11 +167,15 @@ pip install -r requirements.txt
 # 3) PostgreSQL (local o Docker)
 # docker run --name pg -e POSTGRES_PASSWORD=postgres -p 5432:5432 -d postgres:15
 # docker exec -it pg psql -U postgres -c "CREATE DATABASE binance_db;"
-Configuración
-Crea un archivo .env en la raíz (no lo subas a Git):
+```
 
-ini
-Copiar código
+---
+
+## Configuración
+
+Crea un archivo `.env` en la raíz (no lo subas a Git):
+
+```ini
 POSTGRES_USER=tu_usuario
 POSTGRES_PASSWORD=tu_password
 POSTGRES_HOST=localhost
@@ -174,23 +187,32 @@ BINANCE_BASE_URL=https://api.binance.com
 DEFAULT_INTERVAL=15m
 REQUEST_TIMEOUT=20
 MAX_CANDLES=1000
-Ejecución
-bash
-Copiar código
+```
+
+---
+
+## Ejecución
+
+```bash
 uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
-Docs
+```
 
-Swagger UI → http://127.0.0.1:8000/docs
+**Docs**
 
-ReDoc → http://127.0.0.1:8000/redoc
+* Swagger UI → [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
+* ReDoc → [http://127.0.0.1:8000/redoc](http://127.0.0.1:8000/redoc)
 
-Endpoints
-<details> <summary><b>Trades</b> — crear y listar</summary>
-POST /trades — crea un trade (idempotente por symbol+timestamp)
-GET /trades — lista trades (orden desc por fecha)
+---
 
-bash
-Copiar código
+## Endpoints
+
+<details>
+<summary><b>Trades</b> — crear y listar</summary>
+
+**POST /trades** — crea un trade (idempotente por `symbol+timestamp`)
+**GET /trades** — lista trades (orden desc por fecha)
+
+```bash
 # Crear
 curl -X POST "http://127.0.0.1:8000/trades" \
   -H "Content-Type: application/json" \
@@ -198,12 +220,17 @@ curl -X POST "http://127.0.0.1:8000/trades" \
 
 # Listar (paginado)
 curl "http://127.0.0.1:8000/trades?limit=50&offset=0"
-</details> <details> <summary><b>Historical Prices (OHLCV)</b> — insertar y consultar</summary>
-POST /historical_prices — inserta un registro OHLCV
-GET /historical_prices — lista velas (filtros por symbol, interval, from, to)
+```
 
-bash
-Copiar código
+</details>
+
+<details>
+<summary><b>Historical Prices (OHLCV)</b> — insertar y consultar</summary>
+
+**POST /historical_prices** — inserta un registro OHLCV
+**GET /historical_prices** — lista velas (filtros por `symbol`, `interval`, `from`, `to`)
+
+```bash
 # Crear manualmente una vela
 curl -X POST "http://127.0.0.1:8000/historical_prices" \
   -H "Content-Type: application/json" \
@@ -217,17 +244,23 @@ curl -X POST "http://127.0.0.1:8000/historical_prices" \
 
 # Listar por rango
 curl "http://127.0.0.1:8000/historical_prices?symbol=BTCUSDT&interval=15m&from=2021-01-01&to=2021-01-02&limit=200"
-</details> <details> <summary><b>Binance Fetch</b> — descarga y guarda en DB</summary>
-GET /fetch_and_store_data/{symbol}
-Parámetros: interval, start_date, end_date, max_candles
+```
 
-bash
-Copiar código
+</details>
+
+<details>
+<summary><b>Binance Fetch</b> — descarga y guarda en DB</summary>
+
+**GET /fetch_and_store_data/{symbol}**
+Parámetros: `interval`, `start_date`, `end_date`, `max_candles`
+
+```bash
 curl "http://127.0.0.1:8000/fetch_and_store_data/BTCUSDT?interval=1h&start_date=2021-01-01&end_date=2021-02-01&max_candles=500"
-Respuesta típica
+```
 
-json
-Copiar código
+**Respuesta típica**
+
+```json
 {
   "symbol": "BTCUSDT",
   "interval": "1h",
@@ -237,33 +270,42 @@ Copiar código
   "from": "2021-01-01T00:00:00Z",
   "to": "2021-02-01T00:00:00Z"
 }
+```
+
 </details>
-Pruebas (sugerido)
-Unit: servicios y repos (pytest, pytest-asyncio).
 
-DB: PostgreSQL en Docker o testcontainers con fixtures por test.
+---
 
-API: httpx.AsyncClient sobre la app FastAPI.
+## Buenas prácticas y decisiones
 
-Seguridad y configuración
-No subas .env ni credenciales (usa .env.example).
+* **Async end-to-end**: evitar bloqueos I/O y mejorar throughput.
+* **Idempotencia por diseño**: `UNIQUE(symbol, interval, open_time)` evita duplicados.
+* **Validación**: parseo estricto de fechas y numéricos (Pydantic/ORM).
+* **Rate limits**: reintentos con backoff; timeouts definidos.
+* **Observabilidad**: logs estructurados, métricas básicas de inserción/omisión.
 
-Revisa CORS si expones públicamente.
+---
 
-En producción: TLS hacia DB y secretos via variables de entorno.
+## Pruebas (sugerido)
 
-Roadmap
-Jobs programados (APScheduler/Celery) para capturas periódicas.
+* **Unit**: servicios y repos (`pytest`, `pytest-asyncio`).
+* **DB**: PostgreSQL en Docker o `testcontainers`.
+* **API**: `httpx.AsyncClient` sobre la app FastAPI.
 
-Export endpoints (CSV/Parquet) para ciencia de datos/ML.
+---
 
-Integración ML (entrenar con OHLCV persistidos).
+## Roadmap
 
-Bot market maker (replay + live con colas de mensajes).
+* Jobs programados (APScheduler/Celery) para capturas periódicas.
+* Endpoints de exportación (CSV/Parquet) para ciencia de datos/ML.
+* Integración ML (entrenar modelos con OHLCV persistidos).
+* Bot market maker (replay + live con colas de mensajes).
 
-Docker Compose (opcional)
-yaml
-Copiar código
+---
+
+## Docker Compose (opcional)
+
+```yaml
 version: "3.8"
 services:
   db:
@@ -282,11 +324,20 @@ services:
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000
 volumes:
   pgdata:
-Licencia
+```
+
+---
+
+## Licencia
+
 Proyecto personal con fines educativos/demostrativos. Úsalo y adáptalo; se agradece atribución cuando corresponda.
 
-Sobre este repo
+---
+
+## Sobre este repo
+
 “<b>Binance-Postgres Service</b>” demuestra habilidades de <b>backend</b>: diseño de servicios, <b>persistencia SQL</b>, asincronía y buenas prácticas en <b>APIs de datos</b>. Es una base clara para crecer hacia ETL/ML/automatización.
 
-perl
-Copiar código
+```
+::contentReference[oaicite:0]{index=0}
+```
