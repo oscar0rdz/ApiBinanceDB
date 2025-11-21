@@ -9,13 +9,6 @@ Listo, Mtro. Yarek. Aquí tienes el archivo en Markdown para descargar y tambié
 <h1 align="center">Binance-Postgres Service</h1>
 <p align="center"><b>FastAPI + Tortoise ORM + PostgreSQL (async)</b></p>
 
-<p align="center">
-  <a href="#"><img alt="Python" src="https://img.shields.io/badge/Python-3.9+-3776AB?logo=python&logoColor=white"></a>
-  <a href="#"><img alt="FastAPI" src="https://img.shields.io/badge/API-FastAPI-009688?logo=fastapi&logoColor=white"></a>
-  <a href="#"><img alt="PostgreSQL" src="https://img.shields.io/badge/DB-PostgreSQL-336791?logo=postgresql&logoColor=white"></a>
-  <a href="#"><img alt="Async" src="https://img.shields.io/badge/Async-aiohttp%20%7C%20asyncio-2C3E50"></a>
-  <a href="#"><img alt="ORM" src="https://img.shields.io/badge/ORM-Tortoise%20ORM-6E44FF"></a>
-</p>
 
 <p align="center">
   Servicio backend que <b>descarga velas OHLCV desde la API de Binance</b> y las <b>almacena en PostgreSQL</b> mediante una <b>API REST</b> asincrónica con FastAPI.
