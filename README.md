@@ -55,29 +55,6 @@ Listo, Mtro. Yarek. Aquí tienes el archivo en Markdown para descargar y tambié
 
 Resultado: un backend que **descarga, valida y guarda** datos de mercado listos para **ciencia de datos, dashboards, pipelines de ML o un bot** posterior.
 
----
-
-## Arquitectura
-
-```
-
-```
-      ┌─────────────┐        HTTP (async)        ┌───────────────┐
-```
-
-Request → │   FastAPI   │  ───────────────────────→  │  Binance API  │
-└─────┬───────┘                            └───────────────┘
-│
-│  Models / Repos (Tortoise ORM async)
-▼
-┌─────────────┐     SQL (async)     ┌────────────────────┐
-│  Services   │  ─────────────────→ │   PostgreSQL 12+   │
-│  Layer      │  ←─────────────────  │ (índices únicos)   │
-└─────────────┘                      └────────────────────┘
-
-````
-
----
 
 ## Stack (y por qué)
 
