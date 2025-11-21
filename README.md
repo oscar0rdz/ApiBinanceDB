@@ -4,8 +4,8 @@ Listo, Mtro. Yarek. Aquí tienes el archivo en Markdown para descargar y tambié
 
 ---
 
-```markdown
-<!-- Encabezado centrado con badges -->
+
+
 <h1 align="center">Binance-Postgres Service</h1>
 <p align="center"><b>FastAPI + Tortoise ORM + PostgreSQL (async)</b></p>
 
