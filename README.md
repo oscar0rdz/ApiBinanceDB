@@ -10,45 +10,30 @@
 
 ---
 
-## Tabla de contenidos
-- [Narrativa: ¿Qué hace y cómo lo hace?](#narrativa-qué-hace-y-cómo-lo-hace)
-- [Arquitectura](#arquitectura)
-- [Stack (y por qué)](#stack-y-por-qué)
-- [Características](#características)
-- [Esquema de Datos (SQL & ORM)](#esquema-de-datos-sql--orm)
-- [Instalación](#instalación)
-- [Configuración](#configuración)
-- [Ejecución](#ejecución)
-- [Endpoints](#endpoints)
-- [Buenas prácticas y decisiones](#buenas-prácticas-y-decisiones)
-- [Pruebas (sugerido)](#pruebas-sugerido)
-- [Roadmap](#roadmap)
-- [Docker Compose (opcional)](#docker-compose-opcional)
-- [Licencia](#licencia)
-- [Sobre este repo](#sobre-este-repo)
+## FastAPI + Tortoise ORM + PostgreSQL
+Esto inicia buscando un objetivo para crear un proyecto e implemnetar distintas herramientas que se necesitan para desarrollar proyectos aplicado a trading.
+Lo que relice  es con  Fast Api es conectrme conectarme  a  Binance para obtener los datos que necesto, descargar esos datos y posterior mente pasra a guardando los datos 
+en una bas e de datos PostgreSQL. El Desarrollo d este proyetco feu comnpleto desde la creacion y configuracion del servidor para comunicranos con la Apì de binace, La creacion ny el diseño de la base de datos  con la idea de que se pueddan usar posterior mente y ya no tener que descargarlo de nuevo. 
 
----
-
-## Narrativa: ¿Qué hace y cómo lo hace?
-
-**Historia corta:** quieres un **histórico confiable de velas (OHLCV)** de Binance en **tu propia base de datos** para análisis, ETL o ML. Este servicio lo resuelve así:
+**Es un **histórico e de velas (OHLCV)** de Binance  que guarda en una  ** base de datos** para análisis, ETL o ML. 
+y lo que hacee es 
 
 1) **Recibes una petición** a la API (`/fetch_and_store_data/{symbol}`) con parámetros como `interval`, `start_date`, `end_date`, `max_candles`.  
-2) **Consultamos Binance** de forma asincrónica con `aiohttp`, respetando timeouts y reintentos.  
-3) **Normalizamos la respuesta** a un esquema claro de velas: `open_time, open, high, low, close, volume, close_time, trades`, etc.  
-4) **Insertamos en PostgreSQL** con `Tortoise ORM` y una **constraint única** `UNIQUE(symbol, interval, open_time)` para evitar duplicados (idempotencia).  
-5) **Respondemos un resumen**: cuántas velas se insertaron, cuántas se omitieron por duplicado, rango temporal cubierto y el estado de la operación.
+2) **Consulta Binance** de forma asincrónica con `aiohttp`, respetando timeouts y reintentos.  
+3) **Normaliza la respuesta** a un esquema claro de velas: `open_time, open, high, low, close, volume, close_time, trades`, etc.  
+4) **Inserta en PostgreSQL** con `Tortoise ORM` y una **constraint única** `UNIQUE(symbol, interval, open_time)` para evitar duplicados (idempotencia).  
+5) *Arroja un resumen**: cuántas velas se insertaron, cuántas se omitieron por duplicado, rango temporal cubierto y el estado de la operación.
 
-Resultado: un backend que **descarga, valida y guarda** datos de mercado listos para **ciencia de datos, dashboards, pipelines de ML o un bot** posterior.
+Resultado: un backend que **descarga, valida y guarda** datos de mercado listos para ciencia de datos 
 
 
-## Stack (y por qué)
+##  Lo que seria el Stack 
 
 - **FastAPI + Uvicorn** → rendimiento, tipado, OpenAPI, auto-docs.  
-- **Tortoise ORM (async)** → modelos Python→SQL con consultas no bloqueantes; `unique_together` para idempotencia.  
-- **PostgreSQL** → precisión numérica (`NUMERIC`) e integridad (índices, constraints).  
+- **Tortoise ORM (async)** → modelos Python→SQL con consultas no bloqueantes; `unique_together`  
+- **PostgreSQL** → (`NUMERIC`) e integridad (índices, constraints).  
 - **aiohttp** → cliente HTTP asincrónico con timeouts/backoff para Binance.  
-- **pandas** → ayudante para normalización/validación cuando aplica.  
+- **pandas** →  normalización/validación cuando aplica.  
 - **python-dotenv** → configuración segura y portable via `.env`.
 
 ---
@@ -249,7 +234,7 @@ curl "http://127.0.0.1:8000/fetch_and_store_data/BTCUSDT?interval=1h&start_date=
 
 ---
 
-## Pruebas (sugerido)
+## Pruebas 
 
 * **Unit**: servicios y repos (`pytest`, `pytest-asyncio`).
 * **DB**: PostgreSQL en Docker o `testcontainers`.
@@ -290,17 +275,3 @@ volumes:
 ```
 
 ---
-
-## Licencia
-
-Proyecto personal con fines educativos/demostrativos. Úsalo y adáptalo; se agradece atribución cuando corresponda.
-
----
-
-## Sobre este repo
-
-“<b>Binance-Postgres Service</b>” demuestra habilidades de <b>backend</b>: diseño de servicios, <b>persistencia SQL</b>, asincronía y buenas prácticas en <b>APIs de datos</b>. Es una base clara para crecer hacia ETL/ML/automatización.
-
-```
-::contentReference[oaicite:0]{index=0}
-```
